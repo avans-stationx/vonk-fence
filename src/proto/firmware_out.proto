@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package vonk_fence;
+
+message FirmwareOut {
+    optional Distance distance = 1;
+}
+
+message Distance {
+    uint32 timestamp = 1;
+    uint32 millimeters = 2;
+}

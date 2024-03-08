@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package vonk_fence;
+
+message FirmwareIn {
+    uint32 flash_millis = 1;
+}
