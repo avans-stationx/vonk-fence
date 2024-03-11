@@ -5,14 +5,16 @@
   "author": "Niels van de Pas <nlw.vandepas1@avans.nl>",
   "license": "MIT",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "nodemon src/runtime/index.ts",
+    "build": "tsc --project src/runtime && next build",
+    "start": "NODE_ENV=production node build/index.js",
     "lint": "next lint",
     "format": "prettier . --write"
   },
   "dependencies": {
+    "express": "^4.18.3",
     "next": "14.1.3",
+    "puppeteer": "^22.4.1",
     "react": "^18",
     "react-dom": "^18"
   },
@@ -22,7 +24,9 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.1.3",
+    "nodemon": "^3.1.0",
     "prettier": "^3.2.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
