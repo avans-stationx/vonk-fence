@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package vonk_fence;
+
+message CameraOut {
+    optional string filename = 1;
+}

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package vonk_fence;
+
+import "shared.proto";
+
+message CameraIn {
+  optional PhotoRequest photo_request = 1;
+  optional RegionOfInterest region_of_interest = 2;
+}
+
+message PhotoRequest {
+  uint32 timestamp = 1;
+}

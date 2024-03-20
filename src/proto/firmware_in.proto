@@ -3,5 +3,12 @@ syntax = "proto3";
 package vonk_fence;
 
 message FirmwareIn {
-    uint32 flash_millis = 1;
+    optional uint32 ping = 1;
+    uint32 flash_millis = 2;
+    optional DataRequest data_request = 3;
+}
+
+message DataRequest {
+    bool volume = 1;
+    bool region_of_interest = 2;
 }

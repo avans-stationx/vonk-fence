@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package vonk_fence;
+
+message RegionOfInterest {
+  float left = 1;
+  float top = 2;
+}

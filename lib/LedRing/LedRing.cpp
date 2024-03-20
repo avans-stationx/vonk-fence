@@ -9,6 +9,7 @@ LedRing::LedRing(uint8_t count,
       UPDATE_INTERVAL_MILLIS(updateIntervalMillis),
       HUE_INCREMENT(hueIncrement) {
   hue = 0;
+  flashDuration = 200;
 }
 
 void LedRing::begin() {
@@ -16,18 +17,28 @@ void LedRing::begin() {
   nextUpdate = millis();
 }
 
-void LedRing::update(uint64_t now) {
-  if (now >= nextUpdate) {
-    ring.fill(ring.ColorHSV(hue, 255, 63));
-    ring.show();
-    hue += HUE_INCREMENT;
-    nextUpdate = now + UPDATE_INTERVAL_MILLIS;
+void LedRing::update(uint32_t now) {
+  if (now < nextUpdate) {
+    return;
   }
+
+  ring.fill(ring.ColorHSV(hue, 255, 63));
+  ring.show();
+  hue += HUE_INCREMENT;
+  nextUpdate = now + UPDATE_INTERVAL_MILLIS;
 }
 
-void LedRing::flash(uint16_t duration) {
+void LedRing::flash() {
+  flash(flashDuration);
+}
+
+void LedRing::flash(uint32_t duration) {
   ring.fill(0xffffffff);
   ring.show();
 
   nextUpdate = millis() + duration;
+}
+
+void LedRing::setFlashDuration(uint32_t duration) {
+  flashDuration = duration;
 }

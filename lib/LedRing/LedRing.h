@@ -10,6 +10,7 @@ class LedRing {
   const uint16_t HUE_INCREMENT;
   uint64_t nextUpdate;
   uint16_t hue;
+  uint32_t flashDuration;
 
  public:
   LedRing(uint8_t count,
@@ -19,8 +20,10 @@ class LedRing {
           uint16_t hueIncrement);
 
   void begin(void);
-  void update(uint64_t now);
-  void flash(uint16_t duration);
+  void update(uint32_t now);
+  void flash(void);
+  void flash(uint32_t duration);
+  void setFlashDuration(uint32_t duration);
 };
 
 #endif

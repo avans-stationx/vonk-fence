@@ -1,14 +1,57 @@
+import path from 'path';
 import { AddressInfo } from 'net';
+import { libcamera } from 'libcamera';
 import { startClient } from './client';
 import { createServer } from './server';
+import { vonk_fence } from './generated_protos/protos';
+import CameraBridge from './camera-bridge';
+import FirmwareBridge from './firmware-bridge';
 
 async function main() {
-  const server = await createServer();
-  server.listen();
+  // const server = await createServer();
+  // server.listen();
 
-  const { port } = server.address() as AddressInfo;
+  // const { port } = server.address() as AddressInfo;
 
-  await startClient(port);
+  // const trigger = await startClient(port);
+
+  const camera = new CameraBridge();
+
+  const firmware = new FirmwareBridge();
+  await firmware.startCommunication();
+
+  firmware.enablePing();
+
+  const firmwareSetupMessage = new vonk_fence.FirmwareIn({
+    flashMillis: 200,
+    dataRequest: {
+      volume: true,
+      regionOfInterest: true,
+    },
+  });
+
+  firmware.sendRequest(firmwareSetupMessage);
+
+  firmware.on('detected', (timestamp) => {
+    camera.sendRequest(
+      new vonk_fence.CameraIn({
+        photoRequest: {
+          timestamp,
+        },
+      }),
+    );
+  });
+
+  firmware.on('region-of-interest', (left, top) => {
+    camera.sendRequest(
+      new vonk_fence.CameraIn({
+        regionOfInterest: {
+          left,
+          top,
+        },
+      }),
+    );
+  });
 }
 
 main();

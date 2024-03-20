@@ -2,11 +2,27 @@ syntax = "proto3";
 
 package vonk_fence;
 
+import "shared.proto";
+
 message FirmwareOut {
-    optional Distance distance = 1;
+    optional Pong pong = 1;
+    optional Detector detector = 2;
+    optional Volume volume = 3;
+    optional RegionOfInterest region_of_interest = 4;
 }
 
-message Distance {
+message Pong {
+    uint32 id = 1;
+    uint32 timestamp = 2;
+}
+
+message Detector {
     uint32 timestamp = 1;
     uint32 millimeters = 2;
+    bool detected = 3;
+}
+
+message Volume {
+    float left = 1;
+    float right = 2;
 }
