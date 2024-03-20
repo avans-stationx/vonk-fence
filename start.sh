@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 
-if [[ $* == --production ]]
-then
-  cd #INSTALL_PATH#
-fi
+#CD_INSTALL_PATH#
 
 source .venv/bin/activate
 cd ./build
-pnpm run start
+exec pnpm run start

@@ -17,4 +17,5 @@ pnpm pbjs --target static-module --wrap commonjs --es6 src/proto/*.proto | tee $
 if [[ $* == --production ]] || [[ $* == --include-python ]]
 then
   protoc -I src/proto --python_out=$OUTPUT --mypy_out=$OUTPUT --proto_path=src/proto src/proto/*.proto
+  protol --create-package --in-place --python-out $OUTPUT protoc --proto-path=src/proto src/proto/*.proto
 fi
