@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ $* == *--flag* ]]
+if [[ $* == --production ]]
 then
   cd #INSTALL_PATH#
 fi

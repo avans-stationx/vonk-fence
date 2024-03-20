@@ -1,13 +1,20 @@
 #!/bin/bash
 
+PRODUCTION=build/generated_protos
+SOURCE=src/runtime/generated_protos
+
 if [[ $* == --production ]]
 then
-  OUTPUT=build/generated_protos
+  OUTPUT=$PRODUCTION
 else
-  OUTPUT=src/runtime/generated_protos
+  OUTPUT=$SOURCE
 fi
 
-mkdir -p $OUTPUT
+mkdir -p $SOURCE $OUTPUT
 
-pnpm pbjs --target static-module --wrap commonjs --es6 src/proto/*.proto | tee $OUTPUT/protos.js | pnpm pbts --out $OUTPUT/protos.d.ts -
-protoc -I src/proto --python_out=$OUTPUT --mypy_out=$OUTPUT --proto_path=src/proto src/proto/*.proto
+pnpm pbjs --target static-module --wrap commonjs --es6 src/proto/*.proto | tee $SOURCE/protos.js | pnpm pbts --out $SOURCE/protos.d.ts -
+
+if [[ $* == --production ]] || [[ $* == --include-python ]]
+then
+  protoc -I src/proto --python_out=$OUTPUT --mypy_out=$OUTPUT --proto_path=src/proto src/proto/*.proto
+fi

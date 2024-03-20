@@ -11,8 +11,8 @@
     "lint": "next lint",
     "format": "prettier . --write",
     "generate:protos": "./protos.sh",
-    "generate:protos:build": "./protos.sh --production",
-    "gulp": "gulp"
+    "generate:protos:python": "./protos.sh --include-python",
+    "generate:protos:build": "./protos.sh --production"
   },
   "dependencies": {
     "express": "^4.18.3",
