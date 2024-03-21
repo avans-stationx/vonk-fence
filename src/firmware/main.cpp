@@ -5,7 +5,7 @@
 #include "firmware_in.pb.h"
 #include "firmware_out.pb.h"
 
-Detector detector(A0, 500, 50, 1000);
+Detector detector(A0, 300, 50, 1000);
 LedRing ring(16, 6, NEO_GRB | NEO_KHZ800, 5, 10);
 
 void setup() {
@@ -37,11 +37,26 @@ void loop() {
     response.has_detector = true;
     response.detector.detected = true;
     response.detector.timestamp = now;
-    ring.flash();
   }
 
-  if (gotRequest && request.flash_millis > 0) {
-    ring.setFlashDuration(request.flash_millis);
+  if (gotRequest && request.has_flash_request) {
+    const vonk_fence_FlashRequest flashRequest = request.flash_request;
+
+    if (flashRequest.has_duration) {
+      if (flashRequest.strobe) {
+        ring.flash(flashRequest.duration);
+      } else {
+        ring.setFlashDuration(flashRequest.duration);
+      }
+    }
+
+    if (flashRequest.has_override) {
+      ring.setFlashOverride(flashRequest.override);
+    }
+
+    if (flashRequest.strobe && !flashRequest.has_duration) {
+      ring.flash();
+    }
   }
 
   if (gotRequest && request.has_ping) {

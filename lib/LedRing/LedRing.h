@@ -11,6 +11,7 @@ class LedRing {
   uint64_t nextUpdate;
   uint16_t hue;
   uint32_t flashDuration;
+  bool flashOverride;
 
  public:
   LedRing(uint8_t count,
@@ -23,7 +24,9 @@ class LedRing {
   void update(uint32_t now);
   void flash(void);
   void flash(uint32_t duration);
+  void showWhite(void);
   void setFlashDuration(uint32_t duration);
+  void setFlashOverride(bool state);
 };
 
 #endif

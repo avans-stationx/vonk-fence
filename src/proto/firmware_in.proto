@@ -4,8 +4,14 @@ package vonk_fence;
 
 message FirmwareIn {
     optional uint32 ping = 1;
-    uint32 flash_millis = 2;
+    optional FlashRequest flash_request = 2;
     optional DataRequest data_request = 3;
+}
+
+message FlashRequest {
+    bool strobe = 1;
+    optional uint32 duration = 2;
+    optional bool override = 3;
 }
 
 message DataRequest {

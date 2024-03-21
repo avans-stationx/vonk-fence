@@ -101,7 +101,7 @@ export default class FirmwareBridge extends (EventEmitter as new () => TypedEmit
     this.decoder.on('data', this.handleResponse.bind(this));
     this.port.pipe(this.decoder);
 
-    return sleep(2000);
+    return sleep(1000);
   }
 
   private handleResponse(data: Buffer) {
@@ -112,11 +112,8 @@ export default class FirmwareBridge extends (EventEmitter as new () => TypedEmit
     }
 
     if (response.detector) {
-      const actualTimestamp = Math.round(
-        this.timestampSamples.getMean() + response.detector.timestamp,
-      );
 
-      this.emit('detected', actualTimestamp);
+      this.emit('detected', Date.now() - this.latencySamples.getMean() / 2);
     }
 
     if (response.volume) {

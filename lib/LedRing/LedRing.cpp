@@ -10,6 +10,7 @@ LedRing::LedRing(uint8_t count,
       HUE_INCREMENT(hueIncrement) {
   hue = 0;
   flashDuration = 200;
+  flashOverride = false;
 }
 
 void LedRing::begin() {
@@ -19,6 +20,10 @@ void LedRing::begin() {
 
 void LedRing::update(uint32_t now) {
   if (now < nextUpdate) {
+    return;
+  }
+
+  if (flashOverride) {
     return;
   }
 
@@ -33,12 +38,26 @@ void LedRing::flash() {
 }
 
 void LedRing::flash(uint32_t duration) {
+  showWhite();
+  nextUpdate = millis() + duration;
+}
+
+void LedRing::showWhite() {
   ring.fill(0xffffffff);
   ring.show();
-
-  nextUpdate = millis() + duration;
 }
 
 void LedRing::setFlashDuration(uint32_t duration) {
   flashDuration = duration;
+}
+
+void LedRing::setFlashOverride(bool state) {
+  flashOverride = state;
+
+  if (flashOverride) {
+    showWhite();
+    return;
+  }
+
+  nextUpdate = millis();
 }

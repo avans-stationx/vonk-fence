@@ -1,6 +1,5 @@
 import path from 'path';
 import { AddressInfo } from 'net';
-import { libcamera } from 'libcamera';
 import { startClient } from './client';
 import { createServer } from './server';
 import { vonk_fence } from './generated_protos/protos';
@@ -19,11 +18,12 @@ async function main() {
 
   const firmware = new FirmwareBridge();
   await firmware.startCommunication();
-
   firmware.enablePing();
 
   const firmwareSetupMessage = new vonk_fence.FirmwareIn({
-    flashMillis: 200,
+    flashRequest: {
+      duration: 300,
+    },
     dataRequest: {
       volume: true,
       regionOfInterest: true,
@@ -33,6 +33,14 @@ async function main() {
   firmware.sendRequest(firmwareSetupMessage);
 
   firmware.on('detected', (timestamp) => {
+    firmware.sendRequest(
+      new vonk_fence.FirmwareIn({
+        flashRequest: {
+          strobe: true,
+        },
+      }),
+    );
+
     camera.sendRequest(
       new vonk_fence.CameraIn({
         photoRequest: {
