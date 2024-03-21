@@ -112,7 +112,6 @@ export default class FirmwareBridge extends (EventEmitter as new () => TypedEmit
     }
 
     if (response.detector) {
-
       this.emit('detected', Date.now() - this.latencySamples.getMean() / 2);
     }
 

@@ -1,8 +1,17 @@
+import gc
 import generated_protos.camera_in_pb2 as CameraIn
 import generated_protos.camera_out_pb2 as CameraOut
-from libcamera import controls
+from libcamera import controls as camera_controls
+from os.path import join
 from picamera2 import Picamera2
 import sys
+import time
+
+def now_millis():
+    now = time.time() * 1000
+    return int(round(now))
+
+Picamera2.set_logging(level=Picamera2.ERROR)
 
 crop_size = 1500
 
@@ -12,16 +21,23 @@ config['main']['size'] = (crop_size, crop_size)
 picam.configure(config)
 
 controls = {
-    'AfMode': controls.AfModeEnum.Continuous,
-    'AfRange': controls.AfRangeEnum.Macro,
-    'AfSpeed': controls.AfSpeedEnum.Fast,
-    'AwbMode': controls.AwbModeEnum.Fluorescent,
+    'AfMode': camera_controls.AfModeEnum.Continuous,
+    'AfRange': camera_controls.AfRangeEnum.Macro,
+    'AfSpeed': camera_controls.AfSpeedEnum.Fast,
+    'AwbMode': camera_controls.AwbModeEnum.Fluorescent,
+    'ExposureTime': 10000,
     'ScalerCrop': (1400, 1300, crop_size, crop_size),
 }
 
 picam.set_controls(controls)
+picam.options['quality'] = 80
 
 picam.start()
+
+(sensor_width, sensor_height) = picam.camera_properties['PixelArraySize']
+
+gc.disable()
+gc.collect()
 
 while True:
     request_length = int.from_bytes(sys.stdin.buffer.read(2), byteorder='big', signed=False)
@@ -33,15 +49,19 @@ while True:
     response = CameraOut.CameraOut()
 
     if request.HasField('photo_request'):
-        filename = f'../../photos/{request.photo_request.timestamp}.png'
+        photo_request = request.photo_request
+        filename = join(photo_request.storage_path, f'{photo_request.timestamp}.jpg')
         picam.capture_file(filename)
+        now = now_millis()
 
         has_response = True
-        response.filename = filename
+        response.photo_result.filename = filename
+        response.photo_result.time_taken_millis = now - photo_request.timestamp
+        gc.collect()
 
     if request.HasField('region_of_interest'):
-        left = request.region_of_interest.left
-        top = request.region_of_interest.top
+        left = request.region_of_interest.left * sensor_width
+        top = request.region_of_interest.top * sensor_height
         controls['ScalerCrop'] = (left, top, crop_size, crop_size)
         picam.set_controls(controls)
 

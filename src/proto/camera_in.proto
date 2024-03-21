@@ -10,5 +10,6 @@ message CameraIn {
 }
 
 message PhotoRequest {
-  uint32 timestamp = 1;
+  uint64 timestamp = 1;
+  string storage_path = 2;
 }
