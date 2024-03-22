@@ -4,7 +4,9 @@ import TypedEmitter from 'typed-emitter';
 import { Encoder, Decoder } from 'frame-stream';
 import { vonk_fence } from './generated_protos/protos';
 
-type CameraBridgeEvents = {};
+type CameraBridgeEvents = {
+  'photo-result': (filename: string, timeTakenMillis: number) => void;
+};
 
 export default class CameraBridge extends (EventEmitter as new () => TypedEmitter<CameraBridgeEvents>) {
   private process: ChildProcessWithoutNullStreams;
@@ -13,7 +15,10 @@ export default class CameraBridge extends (EventEmitter as new () => TypedEmitte
 
   public constructor() {
     super();
+    this.start();
+  }
 
+  private start() {
     this.process = spawn('python', ['camera.py'], {
       cwd: 'src/runtime',
       stdio: 'pipe',
@@ -33,9 +38,12 @@ export default class CameraBridge extends (EventEmitter as new () => TypedEmitte
 
     this.decoder.on('data', this.handleResponse.bind(this));
     this.process.stdout.pipe(this.decoder);
+
     this.process.stderr.on('data', (data: Buffer) => {
-      console.log(data.toString('ascii'));
+      console.error(data.toString('ascii'));
     });
+
+    this.process.on('exit', () => this.start());
   }
 
   public stop() {
@@ -49,5 +57,13 @@ export default class CameraBridge extends (EventEmitter as new () => TypedEmitte
 
   private handleResponse(data: Buffer) {
     const response = vonk_fence.CameraOut.decode(data);
+
+    if (response.photoResult) {
+      this.emit(
+        'photo-result',
+        response.photoResult.filename,
+        response.photoResult.timeTakenMillis,
+      );
+    }
   }
 }

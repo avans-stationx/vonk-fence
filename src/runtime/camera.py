@@ -2,15 +2,17 @@ import gc
 import generated_protos.camera_in_pb2 as CameraIn
 import generated_protos.camera_out_pb2 as CameraOut
 from libcamera import controls as camera_controls
-from os.path import join
+from math import floor
+from os import environ, path
 from picamera2 import Picamera2
 import sys
 import time
 
 def now_millis():
     now = time.time() * 1000
-    return int(round(now))
+    return int(floor(now + 0.5))
 
+environ['LIBCAMERA_LOG_LEVELS'] = '3'
 Picamera2.set_logging(level=Picamera2.ERROR)
 
 crop_size = 1500
@@ -50,7 +52,7 @@ while True:
 
     if request.HasField('photo_request'):
         photo_request = request.photo_request
-        filename = join(photo_request.storage_path, f'{photo_request.timestamp}.jpg')
+        filename = path.join(photo_request.storage_path, f'{photo_request.timestamp}.jpg')
         picam.capture_file(filename)
         now = now_millis()
 
