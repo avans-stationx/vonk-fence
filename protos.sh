@@ -1,5 +1,12 @@
 #!/bin/bash
 
+generate_javascript_protos() {
+  local path=$1
+  pnpm pbjs --target static-module --wrap commonjs --es6 src/proto/*.proto |
+  tee $path/protos.js |
+  pnpm pbts --out $path/protos.d.ts -
+}
+
 PRODUCTION=build/generated_protos
 SOURCE=src/runtime/generated_protos
 
@@ -12,7 +19,12 @@ fi
 
 mkdir -p $SOURCE $OUTPUT
 
-pnpm pbjs --target static-module --wrap commonjs --es6 src/proto/*.proto | tee $SOURCE/protos.js | pnpm pbts --out $SOURCE/protos.d.ts -
+generate_javascript_protos $SOURCE
+
+if [[ $* == --production ]]
+then
+  cp $SOURCE/protos.js $SOURCE/protos.d.ts $PRODUCTION
+fi
 
 if [[ $* == --production ]] || [[ $* == --include-python ]]
 then

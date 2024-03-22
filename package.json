@@ -5,9 +5,9 @@
   "author": "Niels van de Pas <nlw.vandepas1@avans.nl>",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon src/runtime/index.ts",
-    "build": "tsc --project src/runtime && next build && cp src/runtime/camera.py build",
-    "start": "NODE_ENV=production node build/index.js",
+    "dev": "./start.sh",
+    "build": "./build.sh",
+    "start": "./start.sh --production",
     "lint": "next lint",
     "format": "prettier . --write",
     "generate:protos": "./protos.sh",

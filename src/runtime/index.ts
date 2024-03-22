@@ -5,19 +5,9 @@ import { createServer } from './server';
 import { vonk_fence } from './generated_protos/protos';
 import CameraBridge from './camera-bridge';
 import FirmwareBridge from './firmware-bridge';
-import { spawnSync } from 'child_process';
-
-function getRootFolder() {
-  const { stdout } = spawnSync('git rev-parse --show-toplevel', {
-    shell: true,
-    encoding: 'utf8',
-  });
-
-  return stdout.trimEnd();
-}
 
 async function main() {
-  const rootFolder = getRootFolder();
+  const storagePath = path.resolve(process.env['VONK_MOUNT_POINT']);
 
   // const server = await createServer();
   // server.listen();
@@ -57,7 +47,7 @@ async function main() {
       new vonk_fence.CameraIn({
         photoRequest: {
           timestamp: Date.now(),
-          storagePath: path.resolve(rootFolder, 'photos'),
+          storagePath,
         },
       }),
     );

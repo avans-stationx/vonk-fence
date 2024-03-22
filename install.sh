@@ -25,8 +25,6 @@ fi
 
 pnpm run build
 
-mkdir -p photos
-
 if $PRODUCTION
 then
   SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)"
