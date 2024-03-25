@@ -2,6 +2,7 @@
 
 if [[ $* == --production ]]
 then
+  export VONK_ENV=production
   PRODUCTION=true
 else
   PRODUCTION=false
@@ -16,20 +17,17 @@ python -m venv .venv --system-site-packages
 source .venv/bin/activate
 pip install -r requirements.txt
 
-sudo apt install -y protobuf-compiler
+sudo apt install -y openbox xinit chromium-browser protobuf-compiler
 
-if $PRODUCTION
-then
-  pnpm run generate:protos:build
-fi
-
-pnpm run build
+./build.sh
 
 if $PRODUCTION
 then
   SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)"
 
-  cp -p start.sh ~/.xinitrc
-  sed -i "s@#CD_INSTALL_PATH#@cd $SCRIPT_DIR@g" ~/.xinitrc
-  ln -s ~/.xinitrc ~/.xsession
+  mkdir -p ~/.config/openbox
+  echo -e "#!/bin/bash\ncd $SCRIPT_DIR\nexec ./start.sh" > ~/.config/openbox/autostart
+  echo -e "#!/bin/bash\nexport VONK_ENV=production\nexec openbox-session" > ~/.xinitrc
+
+  pnpm prune --prod
 fi

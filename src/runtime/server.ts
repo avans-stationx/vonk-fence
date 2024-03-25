@@ -1,7 +1,6 @@
 import http from 'http';
 import Express from 'express';
 import Next from 'next';
-import config from './next.config';
 
 export async function createServer(): Promise<http.Server> {
   const app = Express();
@@ -9,7 +8,6 @@ export async function createServer(): Promise<http.Server> {
   const next = Next({
     customServer: true,
     hostname: 'localhost',
-    conf: config,
     dev: process.env.NODE_ENV != 'production',
   });
 

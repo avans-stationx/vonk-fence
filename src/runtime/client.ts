@@ -1,4 +1,4 @@
-import Puppeteer from 'puppeteer';
+import Puppeteer from 'puppeteer-core';
 
 type Trigger = () => Promise<void>;
 

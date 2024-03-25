@@ -2,19 +2,19 @@ import path from 'path';
 import { AddressInfo } from 'net';
 import { startClient } from './client';
 import { createServer } from './server';
-import { vonk_fence } from './generated_protos/protos';
+import { vonk_fence } from './generated_protos/protos.js';
 import CameraBridge from './camera-bridge';
 import FirmwareBridge from './firmware-bridge';
 
 async function main() {
   const storagePath = path.resolve(process.env['VONK_MOUNT_POINT']);
 
-  // const server = await createServer();
-  // server.listen();
+  const server = await createServer();
+  server.listen();
 
-  // const { port } = server.address() as AddressInfo;
+  const { port } = server.address() as AddressInfo;
 
-  // const trigger = await startClient(port);
+  const trigger = await startClient(port);
 
   const camera = new CameraBridge();
 

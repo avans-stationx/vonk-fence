@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-#CD_INSTALL_PATH#
-
 source .venv/bin/activate
 
-if [[ $* == --production ]]
+if [[ $VONK_ENV == production ]] || [[ $* == --production ]]
 then
   VONK_MOUNT_POINT=/media/vonk-storage
 else
@@ -13,7 +11,7 @@ fi
 
 export VONK_MOUNT_POINT=$VONK_MOUNT_POINT
 
-if [[ $* == --production ]]
+if [[ $VONK_ENV == production ]] || [[ $* == --production ]]
 then
   if [[ ! -d "build" ]]
   then
@@ -28,10 +26,7 @@ then
   cd build
   export NODE_ENV=production
   exec node index.js
-
-  sudo umount $VONK_MOUNT_POINT
-  sudo rm -r $VONK_MOUNT_POINT
 else
   mkdir -p $VONK_MOUNT_POINT
-  exec nodemon src/runtime/index.ts
+  exec pnpm nodemon src/runtime/index.ts
 fi
