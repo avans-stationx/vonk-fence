@@ -1,6 +1,8 @@
 {
   "protoc": {
-    "options": ["--proto_path=src/proto"]
+    "options": [
+      "--proto_path=src/proto"
+    ]
   },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
