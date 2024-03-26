@@ -16,7 +16,7 @@
     "generate:protos:build": "./protos.sh --production"
   },
   "dependencies": {
-    "express": "^4.18.3",
+    "express": "^4.19.2",
     "frame-stream": "^4.0.1",
     "next": "14.1.4",
     "protobufjs": "~7.2.6",
