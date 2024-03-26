@@ -1,6 +1,6 @@
-import Puppeteer, { PuppeteerLaunchOptions } from 'puppeteer-core';
+import Puppeteer, { KeyInput, PuppeteerLaunchOptions } from 'puppeteer-core';
 
-type Trigger = () => Promise<void>;
+type Trigger = (key: KeyInput) => Promise<void>;
 
 export async function startClient(port: number): Promise<Trigger> {
   const globalOptions: PuppeteerLaunchOptions = {
@@ -32,7 +32,9 @@ export async function startClient(port: number): Promise<Trigger> {
   const page = await browser.newPage();
 
   await page.goto(`http://localhost:${port}`);
-  await page.click('body');
 
-  return () => page.click('body');
+  await page.focus('body');
+  await page.keyboard.up('a');
+
+  return (key) => page.keyboard.up(key);
 }
