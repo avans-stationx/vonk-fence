@@ -14,7 +14,10 @@ export default class NumericalSampleStorage {
   }
 
   public getMean(): number {
-    const sum = this.samples.reduce((previous, current) => previous + current, 0);
+    const sum = this.samples.reduce(
+      (previous, current) => previous + current,
+      0,
+    );
 
     return sum / this.samples.length;
   }

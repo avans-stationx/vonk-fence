@@ -13,7 +13,8 @@
     "isolatedModules": true,
     "outDir": "../../build"
   },
-  "include": ["**/*.ts",
+  "include": [
+    "**/*.ts"
     // "../../next.config.js"
   ],
   "exclude": ["node_modules"]
