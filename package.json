@@ -2,7 +2,7 @@
   "name": "vonk-fence",
   "version": "0.1.0",
   "private": true,
-  "author": "Niels van de Pas <nlw.vandepas1@avans.nl>",
+  "author": "Avans StationX <stationx.aoc@avans.nl>",
   "license": "MIT",
   "scripts": {
     "dev": "./start.sh",
