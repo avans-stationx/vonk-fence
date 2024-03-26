@@ -9,6 +9,11 @@ else
   VONK_MOUNT_POINT=photos
 fi
 
+if [[ $* == --remote ]]
+then
+  export RUN_LOCATION=remote
+fi
+
 export VONK_MOUNT_POINT=$VONK_MOUNT_POINT
 
 if [[ $VONK_ENV == production ]] || [[ $* == --production ]]

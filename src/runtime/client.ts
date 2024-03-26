@@ -1,9 +1,9 @@
-import Puppeteer from 'puppeteer-core';
+import Puppeteer, { PuppeteerLaunchOptions } from 'puppeteer-core';
 
 type Trigger = () => Promise<void>;
 
 export async function startClient(port: number): Promise<Trigger> {
-  const browser = await Puppeteer.launch({
+  const globalOptions: PuppeteerLaunchOptions = {
     executablePath: '/usr/bin/chromium-browser',
     headless: false,
     defaultViewport: {
@@ -14,10 +14,19 @@ export async function startClient(port: number): Promise<Trigger> {
     args: [
       process.env.NODE_ENV != 'production' ? '' : '--kiosk',
       '--start-maximized',
+      '--autoplay-policy=no-user-gesture-required',
     ],
+  };
+
+  const remoteEnv: PuppeteerLaunchOptions = {
     env: {
       DISPLAY: ':0',
     },
+  };
+
+  const browser = await Puppeteer.launch({
+    ...globalOptions,
+    ...(process.env.RUN_LOCATION == 'remote' ? remoteEnv : {}),
   });
 
   const page = await browser.newPage();
