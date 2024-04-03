@@ -19,15 +19,10 @@ These commands will set everything up for you.
 There are three different ways to compile the protobufs in this project.
 
 1. TypeScript-only: `pnpm run generate:protos`
-2. With Python:
-
-   ```sh
-   # Execute the first line if you haven't activated the venv already
-   source .venv/bin/activated
-   pnpm run generate:protos:python
-   ```
-
+2. With Python: `pnpm run generate:protos:python`
 3. For production (emits to build destination): `pnpm run generate:protos:build`
+
+Note: options 2 and 3 generate Python sources, to be able to do that you need to activate the venv first with the command `source .venv/bin/activate`.
 
 ## Arduino
 
