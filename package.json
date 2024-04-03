@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "./start.sh",
     "dev:remote": "./start.sh --remote",
+    "dev:frontend": "./start.sh --frontend-only",
     "build": "./build.sh",
     "start": "./start.sh --production",
     "lint": "next lint",

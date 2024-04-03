@@ -11,6 +11,12 @@ fi
 
 export VONK_MOUNT_POINT=$VONK_MOUNT_POINT
 
+if [[ $* == --frontend-only ]]
+then
+  exec pnpm next dev
+  exit
+fi
+
 if [[ $* == --remote ]]
 then
   export RUN_LOCATION=remote
