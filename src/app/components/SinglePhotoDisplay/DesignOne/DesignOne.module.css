@@ -1,0 +1,12 @@
+.headline,
+.body {
+  font-weight: 700;
+}
+
+.headline {
+  font-size: 300px;
+}
+
+.body {
+  font-size: 150px;
+}

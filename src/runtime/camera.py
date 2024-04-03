@@ -52,7 +52,7 @@ while True:
 
     if request.HasField('photo_request'):
         photo_request = request.photo_request
-        filename = path.join(photo_request.storage_path, f'{photo_request.timestamp}.jpg')
+        filename = path.join(photo_request.storage_path, f'{photo_request.serial}_{photo_request.timestamp}.jpg')
         picam.capture_file(filename)
         now = now_millis()
 
@@ -64,7 +64,7 @@ while True:
     if request.HasField('region_of_interest'):
         left = request.region_of_interest.left * sensor_width
         top = request.region_of_interest.top * sensor_height
-        controls['ScalerCrop'] = (left, top, crop_size, crop_size)
+        controls['ScalerCrop'] = (floor(left), floor(top), crop_size, crop_size)
         picam.set_controls(controls)
 
     if has_response:

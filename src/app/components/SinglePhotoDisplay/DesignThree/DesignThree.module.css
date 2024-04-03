@@ -1,0 +1,16 @@
+.headline,
+.sub {
+  font-weight: 700;
+}
+
+.headline {
+  font-size: 450px;
+}
+
+.sub {
+  font-size: 150px;
+}
+
+.body {
+  font-size: 90px;
+}

@@ -1,11 +1,16 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Roboto_Condensed } from 'next/font/google';
 import AudioSystemProvider from './components/AudioSystem/AudioSystemProvider';
 import BackgroundAudio from './components/AudioSystem/BackgroundAudio';
+import EventHandler from './components/EventHandler';
 import RandomSoundPlayer from './components/AudioSystem/RandomSoundPlayer';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const robotoCondensed = Roboto_Condensed({
+  weight: 'variable',
+  subsets: ['latin'],
+  variable: '--font-roboto-condensed',
+});
 
 export const metadata: Metadata = {
   title: 'VONK Fence Installation',
@@ -19,7 +24,7 @@ type RootLayoutProps = {
 const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={robotoCondensed.className}>
         <AudioSystemProvider>
           {children}
           <BackgroundAudio
@@ -44,6 +49,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
             intervalMillis={10000}
             interruptGroup="ralf"
           />
+          <EventHandler />
         </AudioSystemProvider>
       </body>
     </html>

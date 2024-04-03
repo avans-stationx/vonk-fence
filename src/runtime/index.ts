@@ -1,4 +1,5 @@
 import path from 'path';
+import { promises as fs } from 'fs';
 import { AddressInfo } from 'net';
 import { startClient } from './client';
 import { createServer } from './server';
@@ -35,24 +36,7 @@ async function main() {
 
   firmware.sendRequest(firmwareSetupMessage);
 
-  firmware.on('detected', (timestamp) => {
-    firmware.sendRequest(
-      new vonk_fence.FirmwareIn({
-        flashRequest: {
-          strobe: true,
-        },
-      }),
-    );
-
-    camera.sendRequest(
-      new vonk_fence.CameraIn({
-        photoRequest: {
-          timestamp: Date.now(),
-          storagePath,
-        },
-      }),
-    );
-  });
+  firmware.on('detected', takePhoto);
 
   firmware.on('region-of-interest', (left, top) => {
     camera.sendRequest(
@@ -64,6 +48,50 @@ async function main() {
       }),
     );
   });
+
+  camera.on('photo-result', (filename) => {
+    trigger('s');
+    setTimeout(() => trigger('o'), 10000);
+  });
+
+  setInterval(takePhoto, 30000);
+
+  function takePhoto() {
+    trigger('f');
+
+    const serialPath = path.join(storagePath, 'serial.bin');
+
+    fs.readFile(serialPath)
+      .then((buffer) => buffer.readUInt32BE())
+      .catch(() => -1)
+      .then(async (oldSerial) => {
+        const newSerial = oldSerial + 1;
+
+        await firmware.sendRequestWithTimeout(
+          new vonk_fence.FirmwareIn({
+            flashRequest: {
+              strobe: true,
+            },
+          }),
+          500,
+        );
+
+        camera.sendRequest(
+          new vonk_fence.CameraIn({
+            photoRequest: {
+              timestamp: Date.now(),
+              storagePath: photoPath,
+              serial: newSerial,
+            },
+          }),
+        );
+
+        const outBuffer = Buffer.alloc(4);
+        outBuffer.writeUint32BE(newSerial);
+
+        fs.writeFile(serialPath, outBuffer);
+      });
+  }
 }
 
 main();

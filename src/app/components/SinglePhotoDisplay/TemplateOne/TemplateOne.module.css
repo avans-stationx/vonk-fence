@@ -1,0 +1,26 @@
+.background {
+  fill: url(#linear-gradient);
+}
+
+.background,
+.flame {
+  stroke-width: 0px;
+}
+
+.flame {
+  fill: #ffffff;
+}
+
+.photo {
+  transform: translate(301px, 330px);
+}
+
+.text,
+.serial {
+  fill: #ffffff;
+  font-family: var(--font-roboto-condensed);
+}
+
+.serial {
+  font-size: 100px;
+}
