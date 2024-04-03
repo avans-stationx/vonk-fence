@@ -54,8 +54,6 @@ async function main() {
     setTimeout(() => trigger('o'), 10000);
   });
 
-  setInterval(takePhoto, 30000);
-
   function takePhoto() {
     trigger('f');
 
