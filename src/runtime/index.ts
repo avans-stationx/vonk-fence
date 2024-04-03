@@ -8,8 +8,9 @@ import FirmwareBridge from './firmware-bridge';
 
 async function main() {
   const storagePath = path.resolve(process.env['VONK_MOUNT_POINT']);
+  const photoPath = path.join(storagePath, 'photos');
 
-  const server = await createServer();
+  const server = await createServer(photoPath);
   server.listen();
 
   const { port } = server.address() as AddressInfo;

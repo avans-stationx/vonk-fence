@@ -6,15 +6,15 @@ if [[ $VONK_ENV == production ]] || [[ $* == --production ]]
 then
   VONK_MOUNT_POINT=/media/vonk-storage
 else
-  VONK_MOUNT_POINT=photos
+  VONK_MOUNT_POINT=storage
 fi
+
+export VONK_MOUNT_POINT=$VONK_MOUNT_POINT
 
 if [[ $* == --remote ]]
 then
   export RUN_LOCATION=remote
 fi
-
-export VONK_MOUNT_POINT=$VONK_MOUNT_POINT
 
 if [[ $VONK_ENV == production ]] || [[ $* == --production ]]
 then
@@ -32,6 +32,6 @@ then
   export NODE_ENV=production
   exec node index.js
 else
-  mkdir -p $VONK_MOUNT_POINT
+  mkdir -p $VONK_MOUNT_POINT/photos
   exec pnpm nodemon src/runtime/index.ts
 fi
