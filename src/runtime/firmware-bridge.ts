@@ -22,6 +22,7 @@ export default class FirmwareBridge extends (EventEmitter as new () => TypedEmit
   private port: SerialPort;
   private encoder: Encoder;
   private decoder: Decoder;
+  private acknowledges: Record<number, () => void>;
   private ping?: NodeJS.Timeout;
 
   public constructor() {
@@ -30,6 +31,7 @@ export default class FirmwareBridge extends (EventEmitter as new () => TypedEmit
     this.pings = {};
     this.latencySamples = new NumericalSampleStorage(20);
     this.timestampSamples = new NumericalSampleStorage(20);
+    this.acknowledges = {};
   }
 
   public enablePing() {
@@ -47,7 +49,7 @@ export default class FirmwareBridge extends (EventEmitter as new () => TypedEmit
       });
 
       this.sendRequest(message);
-    }, 1000);
+    }, 5000);
   }
 
   public disablePing() {
@@ -58,11 +60,44 @@ export default class FirmwareBridge extends (EventEmitter as new () => TypedEmit
 
   public sendRequest(message: vonk_fence.IFirmwareIn) {
     if (!this.port.isOpen) {
-      return;
+      return Promise.resolve();
     }
 
     const encoded = vonk_fence.FirmwareIn.encode(message).finish();
-    this.encoder.write(encoded);
+
+    return new Promise<void>((resolve, reject) => {
+      this.encoder.write(encoded, (error) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
+
+  public sendRequestWithTimeout(
+    message: vonk_fence.IFirmwareIn,
+    timeout: number,
+  ): Promise<void> {
+    const acknowledgeId = Math.round(Math.random() * 1000);
+
+    message.acknowledge = acknowledgeId;
+
+    return this.sendRequest(message).then(
+      () =>
+        new Promise((resolve, reject) => {
+          setTimeout(
+            () =>
+              reject(
+                `The acknowledgement for ${acknowledgeId} has not been received on time`,
+              ),
+            timeout,
+          );
+          this.acknowledges[acknowledgeId] = resolve;
+        }),
+    );
   }
 
   private pong(response: vonk_fence.IPong) {
@@ -88,24 +123,28 @@ export default class FirmwareBridge extends (EventEmitter as new () => TypedEmit
 
     this.encoder = new Encoder({
       lengthSize: 2,
-      setLength: (buffer, value) => buffer.writeUInt16BE(value),
     });
 
     this.encoder.pipe(this.port);
 
     this.decoder = new Decoder({
       lengthSize: 2,
-      getLength: (buffer) => buffer.readUint16BE(),
     });
 
     this.decoder.on('data', this.handleResponse.bind(this));
     this.port.pipe(this.decoder);
 
-    return sleep(1000);
+    return sleep(5000);
   }
 
   private handleResponse(data: Buffer) {
     const response = vonk_fence.FirmwareOut.decode(data);
+
+    if (response.acknowledge) {
+      this.acknowledges[response.acknowledge]();
+
+      delete this.acknowledges[response.acknowledge];
+    }
 
     if (response.pong) {
       this.pong(response.pong);

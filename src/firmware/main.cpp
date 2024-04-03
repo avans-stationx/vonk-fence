@@ -1,11 +1,21 @@
 #include "main.h"
 #include <Arduino.h>
 #include <Detector.h>
+#include <Potmeter.h>
 #include <Protobuf.h>
+#include <RainbowLed.h>
 #include <RainbowLedWithFlash.h>
+#include <Switch.h>
 
 Detector detector(A0, 300, 50, 1000);
-RainbowLedWithFlash cameraFlash(16, 6, NEO_GRB | NEO_KHZ800, 5, 10);
+Potmeter balance(A1, 50, 50);
+Potmeter regionOfInterestLeft(A2, 50, 50);
+Potmeter regionOfInterestTop(A3, 50, 50);
+RainbowLed bus(16, 3, NEO_GRB | NEO_KHZ800, 100, 200);
+RainbowLed diorama(16, 4, NEO_GRB | NEO_KHZ800, 100, 200);
+RainbowLed illusion(16, 5, NEO_GRB | NEO_KHZ800, 100, 200);
+RainbowLedWithFlash cameraFlash(16, 6, NEO_GRB | NEO_KHZ800, 100, 200);
+Switch settingsGuard(2, 50);
 
 void setup() {
   Serial.begin(115200);
@@ -14,7 +24,14 @@ void setup() {
   }
 
   detector.begin();
+  balance.begin();
+  regionOfInterestLeft.begin();
+  regionOfInterestTop.begin();
+  bus.begin();
+  diorama.begin();
+  illusion.begin();
   cameraFlash.begin();
+  settingsGuard.begin();
 
   cameraFlash.setBrightness(63);
 }
@@ -31,9 +48,17 @@ void loop() {
 
   const uint32_t now = millis();
 
+  bus.update(now);
+  diorama.update(now);
+  illusion.update(now);
   cameraFlash.update(now);
 
   gotResponse = gotResponse || updateDetector(now, &response);
+
+  if (settingsGuard.update(now)) {
+    gotResponse = gotResponse || updateBalance(now, &response);
+    gotResponse = gotResponse || updateRegionOfInterest(now, &response);
+  }
 
   if (gotRequest) {
     gotResponse = gotResponse || handleRequest(now, &request, &response);
@@ -57,10 +82,33 @@ bool updateDetector(uint32_t now, vonk_fence_FirmwareOut* response) {
   return true;
 }
 
+bool updateBalance(uint32_t now, vonk_fence_FirmwareOut* response) {
+  if (!balance.update(now)) {
+    return false;
+  }
+
+  response->has_volume = true;
+  calculateBalance(&response->volume.left, &response->volume.right);
+
+  return true;
+}
+
+bool updateRegionOfInterest(uint32_t now, vonk_fence_FirmwareOut* response) {
+  if (!regionOfInterestLeft.update(now) && !regionOfInterestTop.update(now)) {
+    return false;
+  }
+
+  setRegionOfInterest(response);
+
+  return true;
+}
+
 bool handleRequest(uint32_t now,
                    vonk_fence_FirmwareIn* request,
                    vonk_fence_FirmwareOut* response) {
   bool gotResponse = false;
+
+  gotResponse = gotResponse || handleAcknowledge(request, response);
 
   if (request->has_flash_request) {
     handleFlashRequest(request->flash_request);
@@ -71,17 +119,29 @@ bool handleRequest(uint32_t now,
   if (request->has_data_request) {
     if (request->data_request.volume) {
       gotResponse = true;
-      // TODO: calculate individual gains for left and right channels and set in
-      // the response
+      response->has_volume = true;
+      calculateBalance(&response->volume.left, &response->volume.right);
     }
 
     if (request->data_request.region_of_interest) {
       gotResponse = true;
-      // TODO: set region of interest in the response
+      setRegionOfInterest(response);
     }
   }
 
   return gotResponse;
+}
+
+bool handleAcknowledge(vonk_fence_FirmwareIn* request,
+                       vonk_fence_FirmwareOut* response) {
+  if (!request->has_acknowledge) {
+    return false;
+  }
+
+  response->has_acknowledge = true;
+  response->acknowledge = request->acknowledge;
+
+  return true;
 }
 
 void handleFlashRequest(vonk_fence_FlashRequest flashRequest) {
@@ -113,4 +173,17 @@ bool handlePing(vonk_fence_FirmwareIn* request,
   response->pong.timestamp = millis();
 
   return true;
+}
+
+void calculateBalance(float* left, float* right) {
+  *right = (float)balance.getValue() / 1023.0f;
+  *left = 1.0f - *right;
+}
+
+void setRegionOfInterest(vonk_fence_FirmwareOut* response) {
+  response->has_region_of_interest = true;
+  response->region_of_interest.left =
+      ((float)regionOfInterestLeft.getValue() / 1023.0f);
+  response->region_of_interest.top =
+      ((float)regionOfInterestTop.getValue() / 1023.0f);
 }

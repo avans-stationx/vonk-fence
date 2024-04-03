@@ -6,6 +6,7 @@ message FirmwareIn {
     optional uint32 ping = 1;
     optional FlashRequest flash_request = 2;
     optional DataRequest data_request = 3;
+    optional uint32 acknowledge = 4;
 }
 
 message FlashRequest {

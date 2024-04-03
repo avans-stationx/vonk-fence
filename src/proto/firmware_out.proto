@@ -9,6 +9,7 @@ message FirmwareOut {
     optional Detector detector = 2;
     optional Volume volume = 3;
     optional RegionOfInterest region_of_interest = 4;
+    optional uint32 acknowledge = 5;
 }
 
 message Pong {

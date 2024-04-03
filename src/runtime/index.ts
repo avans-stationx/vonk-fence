@@ -26,7 +26,7 @@ async function main() {
 
   const firmwareSetupMessage = new vonk_fence.FirmwareIn({
     flashRequest: {
-      duration: 300,
+      duration: 500,
     },
     dataRequest: {
       volume: true,
@@ -34,7 +34,7 @@ async function main() {
     },
   });
 
-  firmware.sendRequest(firmwareSetupMessage);
+  await firmware.sendRequest(firmwareSetupMessage);
 
   firmware.on('detected', takePhoto);
 
