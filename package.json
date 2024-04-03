@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "author": "Avans StationX <stationx.aoc@avans.nl>",
+  "contributors": [
+    "Niels van de Pas <nlw.vandepas1@avans.nl>",
+    "Mick Janssen <m.janssen14@avans.nl>",
+    "Renée van der Maden <renee.vandermaden@avans.nl>",
+    "Patrick Gütlich <rp.gutlich@avans.nl>"
+  ],
   "license": "MIT",
   "scripts": {
     "dev": "./start.sh",
