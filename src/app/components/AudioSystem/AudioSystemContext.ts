@@ -6,6 +6,7 @@ export type AudioSystemContextProps = {
   context?: AudioContext;
   leftChannel?: StereoPannerNode;
   rightChannel?: StereoPannerNode;
+  setGains: (left: number, right: number) => void;
   triggerInterrupt: (group: string) => void;
   clearInterrupt: (group: string) => void;
   addInterruptListener: (
@@ -26,13 +27,23 @@ const leftChannel = new StereoPannerNode(context, {
   pan: -1,
 });
 
-leftChannel.connect(context.destination);
+const leftChannelGain = new GainNode(context, {
+  gain: 0.5,
+});
+
+leftChannel.connect(leftChannelGain);
+leftChannelGain.connect(context.destination);
 
 const rightChannel = new StereoPannerNode(context, {
   pan: 1,
 });
 
-rightChannel.connect(context.destination);
+const rightChannelGain = new GainNode(context, {
+  gain: 0.5,
+});
+
+rightChannel.connect(rightChannelGain);
+rightChannelGain.connect(context.destination);
 
 let interruptListeners: Record<string, ((interrupted: boolean) => void)[]> = {};
 
@@ -40,6 +51,10 @@ export const defaultAudioSystemContext: AudioSystemContextProps = {
   context,
   leftChannel,
   rightChannel,
+  setGains(left, right) {
+    leftChannelGain.gain.value = left;
+    rightChannelGain.gain.value = right;
+  },
   triggerInterrupt(group) {
     if (!interruptListeners[group]) {
       return;

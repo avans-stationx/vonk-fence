@@ -11,7 +11,7 @@ async function main() {
   const storagePath = path.resolve(process.env['VONK_MOUNT_POINT']);
   const photoPath = path.join(storagePath, 'photos');
 
-  const server = await createServer(photoPath);
+  const { server, setGains } = await createServer(photoPath);
   server.listen();
 
   const { port } = server.address() as AddressInfo;
@@ -37,6 +37,11 @@ async function main() {
   await firmware.sendRequest(firmwareSetupMessage);
 
   firmware.on('detected', takePhoto);
+
+  firmware.on('volume', (left, right) => {
+    setGains(left, right);
+    trigger('v');
+  });
 
   firmware.on('region-of-interest', (left, top) => {
     camera.sendRequest(

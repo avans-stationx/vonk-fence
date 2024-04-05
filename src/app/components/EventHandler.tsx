@@ -4,9 +4,11 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useRandomSoundEffectPlaylist } from './AudioSystem/useRandomSoundEffectPlaylist';
 import { useKeyboardEvent } from '../hooks/useKeyboardEvent';
+import { useAudioSystem } from './AudioSystem/useAudioSystem';
 
 const EventHandler: React.FC = () => {
   const router = useRouter();
+  const { setGains } = useAudioSystem();
 
   const { fire } = useRandomSoundEffectPlaylist(
     [
@@ -26,6 +28,11 @@ const EventHandler: React.FC = () => {
   useKeyboardEvent('f', () => fire());
   useKeyboardEvent('s', () => router.push(`/single?r=${Math.random()}`));
   useKeyboardEvent('o', () => router.push('/overview'));
+  useKeyboardEvent('v', () => {
+    fetch('/volume')
+      .then((response) => response.json())
+      .then(({ leftGain, rightGain }) => setGains(leftGain, rightGain));
+  });
 
   return <div></div>;
 };
