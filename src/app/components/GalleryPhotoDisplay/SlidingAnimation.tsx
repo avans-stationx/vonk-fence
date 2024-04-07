@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 type SlidingAnimationProps = Omit<
   React.SVGProps<SVGGElement>,
@@ -32,6 +32,8 @@ const SlidingAnimation: React.FC<SlidingAnimationProps> = ({
 
   const spacing = width / (photoCount - 1);
 
+  const getPhotoCallback = useCallback(getPhoto, [getPhoto]);
+
   useEffect(() => {
     setPhotos(initialPhotos);
   }, [photoCount, initialPhotos]);
@@ -44,7 +46,7 @@ const SlidingAnimation: React.FC<SlidingAnimationProps> = ({
     const element = animation.current;
 
     async function handleRepeat() {
-      const photo = await getPhoto();
+      const photo = await getPhotoCallback();
 
       if (direction == 'left') {
         setPhotos((oldPhotos) => [...oldPhotos.slice(1), photo]);
@@ -58,7 +60,7 @@ const SlidingAnimation: React.FC<SlidingAnimationProps> = ({
     return () => {
       element.removeEventListener('repeatEvent', handleRepeat);
     };
-  }, [animation]);
+  }, [animation, direction, getPhotoCallback]);
 
   return (
     <g {...props}>

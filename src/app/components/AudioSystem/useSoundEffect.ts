@@ -1,82 +1,47 @@
-import React, { useEffect } from 'react';
 import { useAudioSystem } from './useAudioSystem';
+import { useAudioInterruptListener } from './useAudioInterruptListener';
+import { createSoundEffectSource, fetchSoundEffect } from './sound-effect';
+import { useEffect, useRef } from 'react';
 
 export function useSoundEffect(
   src: string,
   loop: boolean,
   channel: 'left' | 'right',
-  interruptGroup?: string,
+  interruptGroups?: string[],
+  onEnd?: () => void,
 ) {
-  const {
-    context,
-    leftChannel,
-    rightChannel,
-    triggerInterrupt,
-    clearInterrupt,
-    addInterruptListener,
-    removeInterruptListener,
-  } = useAudioSystem();
-  let audioBuffer: AudioBuffer;
-  let audioSource: AudioBufferSourceNode;
-  let isInterrupted: boolean = false;
+  const { context, leftChannel, rightChannel } = useAudioSystem();
+  const isInterrupted = useAudioInterruptListener(stop, interruptGroups ?? []);
 
-  fetch(src)
-    .then((response) => response.arrayBuffer())
-    .then((audioData) => context.decodeAudioData(audioData))
-    .then((buffer) => (audioBuffer = buffer));
+  let audioBuffer = useRef<AudioBuffer>();
+  let audioSource: AudioBufferSourceNode;
 
   useEffect(() => {
-    if (!interruptGroup) {
-      return;
-    }
+    fetchSoundEffect(src, context).then(
+      (buffer) => (audioBuffer.current = buffer),
+    );
+  });
 
-    addInterruptListener(interruptGroup, interrupt);
-
-    return () => {
-      removeInterruptListener(interruptGroup, interrupt);
-    };
-  }, []);
-
-  function fire(interruptGroups?: string[]) {
+  function fire() {
     if (isInterrupted) {
       return;
     }
 
-    if (interruptGroups) {
-      interruptGroups.forEach((group) => triggerInterrupt(group));
-    }
-
     audioSource?.stop();
 
-    audioSource = context.createBufferSource();
-    audioSource.buffer = audioBuffer;
-    audioSource.loop = loop;
-
-    if (interruptGroups) {
-      audioSource.addEventListener('ended', () => {
-        interruptGroups.forEach((group) => clearInterrupt(group));
-      });
-    }
-
-    if (channel == 'left') {
-      audioSource.connect(leftChannel);
-    } else {
-      audioSource.connect(rightChannel);
-    }
+    audioSource = createSoundEffectSource(
+      context,
+      audioBuffer.current,
+      channel == 'left' ? leftChannel : rightChannel,
+      loop,
+      onEnd,
+    );
 
     audioSource.start();
   }
 
   function stop() {
     audioSource?.stop();
-  }
-
-  function interrupt(interrupted: boolean) {
-    if (interrupted) {
-      stop();
-    }
-
-    isInterrupted = interrupted;
   }
 
   return { fire, stop };

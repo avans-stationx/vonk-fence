@@ -3,12 +3,16 @@ import path from 'path';
 import { promises as fs } from 'fs';
 import SlidingAnimation from '../components/GalleryPhotoDisplay/SlidingAnimation';
 
-const storagePath = path.resolve(process.env['VONK_MOUNT_POINT']);
-const photoPath = path.join(storagePath, 'photos');
-
 const Overview: React.FC = async () => {
   async function getPhotos(): Promise<string[]> {
-    return await fs.readdir(photoPath);
+    try {
+      const storagePath = path.resolve(process.env['VONK_MOUNT_POINT']);
+      const photoPath = path.join(storagePath, 'photos');
+
+      return await fs.readdir(photoPath);
+    } catch {
+      return [];
+    }
   }
 
   const photoRadius = 300;

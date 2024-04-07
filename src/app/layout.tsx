@@ -47,7 +47,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
             ]}
             channel="right"
             intervalMillis={10000}
-            interruptGroup="ralf"
+            interruptGroups={['ralf']}
           />
           <EventHandler />
         </AudioSystemProvider>

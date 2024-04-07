@@ -3,7 +3,7 @@
 import React from 'react';
 import {
   AudioSystemContext,
-  defaultAudioSystemContext,
+  buildDefaultAudioSystemContext,
 } from './AudioSystemContext';
 
 type AudioSystemProviderProps = {
@@ -14,7 +14,7 @@ const AudioSystemProvider: React.FC<AudioSystemProviderProps> = ({
   children,
 }) => {
   return (
-    <AudioSystemContext.Provider value={defaultAudioSystemContext}>
+    <AudioSystemContext.Provider value={buildDefaultAudioSystemContext()}>
       {children}
     </AudioSystemContext.Provider>
   );

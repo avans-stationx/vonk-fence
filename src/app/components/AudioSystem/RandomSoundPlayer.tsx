@@ -8,7 +8,7 @@ type RandomSoundPlayerProps = {
   channel: 'left' | 'right';
   intervalMillis?: number;
   pause?: boolean;
-  interruptGroup?: string;
+  interruptGroups?: string[];
   sendInterrupt?: string[];
 };
 
@@ -17,13 +17,13 @@ const RandomSoundPlayer: React.FC<RandomSoundPlayerProps> = ({
   channel,
   intervalMillis,
   pause,
-  interruptGroup,
+  interruptGroups,
   sendInterrupt,
 }) => {
   const { fire } = useRandomSoundEffectPlaylist(
     sounds,
     channel,
-    interruptGroup,
+    interruptGroups ?? [],
     sendInterrupt,
   );
 
@@ -37,9 +37,9 @@ const RandomSoundPlayer: React.FC<RandomSoundPlayerProps> = ({
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [fire, intervalMillis, pause]);
 
-  return <div></div>;
+  return null;
 };
 
 export default RandomSoundPlayer;

@@ -18,24 +18,24 @@ const BackgroundAudio: React.FC<BackgroundAudioProps> = ({
 }) => {
   const audio = useRef<HTMLAudioElement>();
   const { context, leftChannel, rightChannel } = useAudioSystem();
-  let source: MediaElementAudioSourceNode;
+  const source = useRef<MediaElementAudioSourceNode>();
 
   useEffect(() => {
     if (!audio.current || source) {
       return;
     }
 
-    source = context.createMediaElementSource(audio.current);
+    source.current = context.createMediaElementSource(audio.current);
 
     if (channel == 'left') {
-      source.connect(leftChannel);
+      source.current.connect(leftChannel);
     } else {
-      source.connect(rightChannel);
+      source.current.connect(rightChannel);
     }
   }, [channel, context, leftChannel, rightChannel]);
 
   useEffect(() => {
-    if (!audio.current || !source) {
+    if (!audio.current || !source.current) {
       return;
     }
 

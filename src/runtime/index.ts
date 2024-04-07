@@ -12,7 +12,7 @@ async function main() {
   const photoPath = path.join(storagePath, 'photos');
 
   const { server, setGains } = await createServer(photoPath);
-  server.listen();
+  server.listen(process.env.NODE_ENV != 'production' ? 3000 : undefined);
 
   const { port } = server.address() as AddressInfo;
 

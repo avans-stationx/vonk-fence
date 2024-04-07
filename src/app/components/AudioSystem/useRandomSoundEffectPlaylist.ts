@@ -1,23 +1,48 @@
-import { useSoundEffect } from './useSoundEffect';
+import { useEffect, useRef } from 'react';
+import { useAudioInterruptListener } from './useAudioInterruptListener';
+import { useAudioInterruptSource } from './useAudioInterruptSource';
+import { createSoundEffectSource, fetchSoundEffect } from './sound-effect';
+import { useAudioSystem } from './useAudioSystem';
 
 export function useRandomSoundEffectPlaylist(
   sounds: string[],
   channel: 'left' | 'right',
-  interruptGroup?: string,
+  interruptGroups?: string[],
   sendInterrupt?: string[],
 ) {
-  let currentlyPlaying: ReturnType<typeof useSoundEffect>;
+  const { context, leftChannel, rightChannel } = useAudioSystem();
+  const isInterrupted = useAudioInterruptListener(stop, interruptGroups);
+  const { trigger, clear } = useAudioInterruptSource(sendInterrupt ?? []);
+  const playlist = useRef<AudioBuffer[]>([]);
+  let currentlyPlaying: AudioBufferSourceNode;
 
-  const playlist = sounds.map((sound) =>
-    useSoundEffect(sound, false, channel, interruptGroup),
-  );
+  useEffect(() => {
+    Promise.all(sounds.map((sound) => fetchSoundEffect(sound, context))).then(
+      (buffers) => (playlist.current = buffers),
+    );
+  });
 
   function fire() {
-    currentlyPlaying = playlist[Math.floor(Math.random() * playlist.length)];
-    currentlyPlaying.fire(sendInterrupt);
+    if (isInterrupted) {
+      return;
+    }
+
+    const effect =
+      playlist[Math.floor(Math.random() * playlist.current.length)];
+    currentlyPlaying = createSoundEffectSource(
+      context,
+      effect,
+      channel == 'left' ? leftChannel : rightChannel,
+      false,
+      clear,
+    );
+
+    trigger();
+    currentlyPlaying.start();
   }
 
   function stop() {
+    clear();
     currentlyPlaying?.stop();
   }
 

@@ -4,12 +4,12 @@ import { promises as fs } from 'fs';
 import RandomDesign from '../components/SinglePhotoDisplay/RandomDesign';
 import { DesignProps } from '../components/SinglePhotoDisplay/design-props';
 
-const storagePath = path.resolve(process.env['VONK_MOUNT_POINT']);
-const photoPath = path.join(storagePath, 'photos');
-const serialPath = path.join(storagePath, 'serial.bin');
-
 async function getLatestPhoto(): Promise<DesignProps> {
   try {
+    const storagePath = path.resolve(process.env['VONK_MOUNT_POINT']);
+    const photoPath = path.join(storagePath, 'photos');
+    const serialPath = path.join(storagePath, 'serial.bin');
+
     const buffer = await fs.readFile(serialPath);
     const serialNumber = buffer.readUint32BE();
 

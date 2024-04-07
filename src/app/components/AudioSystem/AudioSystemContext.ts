@@ -19,42 +19,10 @@ export type AudioSystemContextProps = {
   ) => void;
 };
 
-const context = new AudioContext({
-  sampleRate: 48000,
-});
-
-const leftChannel = new StereoPannerNode(context, {
-  pan: -1,
-});
-
-const leftChannelGain = new GainNode(context, {
-  gain: 0.5,
-});
-
-leftChannel.connect(leftChannelGain);
-leftChannelGain.connect(context.destination);
-
-const rightChannel = new StereoPannerNode(context, {
-  pan: 1,
-});
-
-const rightChannelGain = new GainNode(context, {
-  gain: 0.5,
-});
-
-rightChannel.connect(rightChannelGain);
-rightChannelGain.connect(context.destination);
-
 let interruptListeners: Record<string, ((interrupted: boolean) => void)[]> = {};
 
-export const defaultAudioSystemContext: AudioSystemContextProps = {
-  context,
-  leftChannel,
-  rightChannel,
-  setGains(left, right) {
-    leftChannelGain.gain.value = left;
-    rightChannelGain.gain.value = right;
-  },
+const baseContext: AudioSystemContextProps = {
+  setGains() {},
   triggerInterrupt(group) {
     if (!interruptListeners[group]) {
       return;
@@ -87,6 +55,49 @@ export const defaultAudioSystemContext: AudioSystemContextProps = {
   },
 };
 
+export function buildDefaultAudioSystemContext() {
+  if (typeof AudioContext == 'undefined') {
+    return baseContext;
+  }
+
+  const context = new AudioContext({
+    sampleRate: 48000,
+  });
+
+  const leftChannel = new StereoPannerNode(context, {
+    pan: -1,
+  });
+
+  const leftChannelGain = new GainNode(context, {
+    gain: 0.5,
+  });
+
+  leftChannel.connect(leftChannelGain);
+  leftChannelGain.connect(context.destination);
+
+  const rightChannel = new StereoPannerNode(context, {
+    pan: 1,
+  });
+
+  const rightChannelGain = new GainNode(context, {
+    gain: 0.5,
+  });
+
+  rightChannel.connect(rightChannelGain);
+  rightChannelGain.connect(context.destination);
+
+  return {
+    ...baseContext,
+    context,
+    leftChannel,
+    rightChannel,
+    setGains(left, right) {
+      leftChannelGain.gain.value = left;
+      rightChannelGain.gain.value = right;
+    },
+  };
+}
+
 export const AudioSystemContext = createContext<AudioSystemContextProps>(
-  defaultAudioSystemContext,
+  buildDefaultAudioSystemContext(),
 );
