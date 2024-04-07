@@ -13,4 +13,5 @@ message PhotoRequest {
   uint64 timestamp = 1;
   string storage_path = 2;
   uint32 serial = 3;
+  optional string well_known = 4;
 }

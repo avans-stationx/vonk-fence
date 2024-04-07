@@ -5,7 +5,7 @@ import { Encoder, Decoder } from 'frame-stream';
 import { vonk_fence } from './generated_protos/protos';
 
 type CameraBridgeEvents = {
-  'photo-result': (filename: string, timeTakenMillis: number) => void;
+  'photo-result': (filename: string, timeTakenMillis: number, wellKnown?: string) => void;
 };
 
 export default class CameraBridge extends (EventEmitter as new () => TypedEmitter<CameraBridgeEvents>) {
@@ -15,6 +15,8 @@ export default class CameraBridge extends (EventEmitter as new () => TypedEmitte
 
   public constructor() {
     super();
+
+    this.start = this.start.bind(this);
     this.start();
   }
 
@@ -43,10 +45,11 @@ export default class CameraBridge extends (EventEmitter as new () => TypedEmitte
       console.error(data.toString('ascii'));
     });
 
-    this.process.on('exit', () => this.start());
+    this.process.on('exit', this.start);
   }
 
   public stop() {
+    this.process.off('exit', this.start);
     this.process.kill();
   }
 
@@ -63,6 +66,7 @@ export default class CameraBridge extends (EventEmitter as new () => TypedEmitte
         'photo-result',
         response.photoResult.filename,
         response.photoResult.timeTakenMillis,
+        response.photoResult.wellKnown
       );
     }
   }

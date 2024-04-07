@@ -9,4 +9,5 @@ message CameraOut {
 message PhotoResult {
     string filename = 1;
     uint32 time_taken_millis = 2;
+    optional string well_known = 3;
 }

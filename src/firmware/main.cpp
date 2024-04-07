@@ -78,6 +78,7 @@ bool updateDetector(uint32_t now, vonk_fence_FirmwareOut* response) {
   response->has_detector = true;
   response->detector.detected = true;
   response->detector.timestamp = now;
+  response->detector.test_mode = settingsGuard.update(now);
 
   return true;
 }

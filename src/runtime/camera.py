@@ -37,6 +37,10 @@ picam.options['quality'] = 80
 picam.start()
 
 (sensor_width, sensor_height) = picam.camera_properties['PixelArraySize']
+half_sensor_width = sensor_width * 0.5
+quarter_sensor_width = sensor_width * 0.25
+half_sensor_height = sensor_height * 0.5
+quarter_sensor_height = sensor_height * 0.25
 
 gc.disable()
 gc.collect()
@@ -52,7 +56,14 @@ while True:
 
     if request.HasField('photo_request'):
         photo_request = request.photo_request
-        filename = path.join(photo_request.storage_path, f'{photo_request.serial}_{photo_request.timestamp}.jpg')
+
+        if (photo_request.HasField('well_known')):
+            filename = path.join(photo_request.storage_path, photo_request.well_known)
+            response.photo_result.well_known = photo_request.well_known
+        else:
+            filename = path.join(photo_request.storage_path, f'{photo_request.serial}_{photo_request.timestamp}.jpg')
+
+
         picam.capture_file(filename)
         now = now_millis()
 
@@ -62,8 +73,8 @@ while True:
         gc.collect()
 
     if request.HasField('region_of_interest'):
-        left = request.region_of_interest.left * sensor_width
-        top = request.region_of_interest.top * sensor_height
+        left = quarter_sensor_width + (request.region_of_interest.left * half_sensor_width)
+        top = quarter_sensor_height + (request.region_of_interest.top * half_sensor_height)
         controls['ScalerCrop'] = (floor(left), floor(top), crop_size, crop_size)
         picam.set_controls(controls)
 

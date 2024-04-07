@@ -26,15 +26,20 @@ const EventHandler: React.FC = () => {
   );
 
   useKeyboardEvent('f', () => fire());
-  useKeyboardEvent('s', () => router.push(`/single?r=${Math.random()}`));
+  useKeyboardEvent('s', () =>
+    router.push(`/single?r=${Math.round(Math.random() * 1000)}`),
+  );
   useKeyboardEvent('o', () => router.push('/overview'));
+  useKeyboardEvent('t', () =>
+    router.push(`/test?r=${Math.round(Math.random() * 1000)}`),
+  );
   useKeyboardEvent('v', () => {
     fetch('/volume')
       .then((response) => response.json())
       .then(({ leftGain, rightGain }) => setGains(leftGain, rightGain));
   });
 
-  return <div></div>;
+  return null;
 };
 
 export default EventHandler;

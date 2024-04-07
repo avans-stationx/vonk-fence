@@ -1,5 +1,6 @@
 import path from 'path';
 import { promises as fs } from 'fs';
+import { tmpdir } from 'os';
 import { AddressInfo } from 'net';
 import { startClient } from './client';
 import { createServer } from './server';
@@ -36,7 +37,18 @@ async function main() {
 
   await firmware.sendRequest(firmwareSetupMessage);
 
-  firmware.on('detected', takePhoto);
+  firmware.on('detected', (timestamp, testMode) => {
+    if (testMode) {
+      sendPhotoRequest();
+    } else {
+      takePhoto();
+    }
+  });
+
+  firmware.on('volume', (left, right) => {
+    setGains(left, right);
+    trigger('v');
+  });
 
   firmware.on('volume', (left, right) => {
     setGains(left, right);
@@ -54,8 +66,13 @@ async function main() {
     );
   });
 
-  camera.on('photo-result', (filename) => {
-    trigger('s');
+  camera.on('photo-result', (filename, timeTakenMillis, wellKnown) => {
+    if (wellKnown) {
+      trigger('t');
+    } else {
+      trigger('s');
+    }
+
     setTimeout(() => trigger('o'), 10000);
   });
 
@@ -70,30 +87,47 @@ async function main() {
       .then(async (oldSerial) => {
         const newSerial = oldSerial + 1;
 
-        await firmware.sendRequestWithTimeout(
-          new vonk_fence.FirmwareIn({
-            flashRequest: {
-              strobe: true,
-            },
-          }),
-          500,
-        );
-
-        camera.sendRequest(
-          new vonk_fence.CameraIn({
-            photoRequest: {
-              timestamp: Date.now(),
-              storagePath: photoPath,
-              serial: newSerial,
-            },
-          }),
-        );
+        await sendPhotoRequest(newSerial);
 
         const outBuffer = Buffer.alloc(4);
         outBuffer.writeUint32BE(newSerial);
 
         fs.writeFile(serialPath, outBuffer);
       });
+  }
+
+  async function sendPhotoRequest(serial?: number) {
+    await firmware.sendRequestWithTimeout(
+      new vonk_fence.FirmwareIn({
+        flashRequest: {
+          strobe: true,
+        },
+      }),
+      500,
+    );
+
+    if (serial) {
+      camera.sendRequest(
+        new vonk_fence.CameraIn({
+          photoRequest: {
+            timestamp: Date.now(),
+            storagePath: photoPath,
+            serial,
+          },
+        }),
+      );
+    } else {
+      camera.sendRequest(
+        new vonk_fence.CameraIn({
+          photoRequest: {
+            timestamp: Date.now(),
+            storagePath: tmpdir(),
+            serial: 0,
+            wellKnown: 'nl.avans.stationx.vonk-fence-test-photo.jpg',
+          },
+        }),
+      );
+    }
   }
 }
 

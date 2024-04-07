@@ -10,7 +10,7 @@ function sleep(millis: number): Promise<void> {
 }
 
 type FirmwareBridgeEvents = {
-  detected: (timestamp: number) => void;
+  detected: (timestamp: number, testMode: boolean) => void;
   volume: (left: number, right: number) => void;
   'region-of-interest': (left: number, top: number) => void;
 };
@@ -150,8 +150,12 @@ export default class FirmwareBridge extends (EventEmitter as new () => TypedEmit
       this.pong(response.pong);
     }
 
-    if (response.detector) {
-      this.emit('detected', Date.now() - this.latencySamples.getMean() / 2);
+    if (response.detector && response.detector.detected) {
+      this.emit(
+        'detected',
+        Date.now() - this.latencySamples.getMean() / 2,
+        response.detector.testMode ?? false,
+      );
     }
 
     if (response.volume) {

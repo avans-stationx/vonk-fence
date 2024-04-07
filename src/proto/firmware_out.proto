@@ -21,6 +21,7 @@ message Detector {
     uint32 timestamp = 1;
     uint32 millimeters = 2;
     bool detected = 3;
+    bool test_mode = 4;
 }
 
 message Volume {
