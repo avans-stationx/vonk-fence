@@ -5,7 +5,12 @@ import { Encoder, Decoder } from 'frame-stream';
 import { vonk_fence } from './generated_protos/protos';
 
 type CameraBridgeEvents = {
-  'photo-result': (filename: string, timeTakenMillis: number, wellKnown?: string) => void;
+  'photo-result': (
+    filename: string,
+    timeTakenMillis: number,
+    wellKnown?: string,
+  ) => void;
+  'region-of-interest': (left: number, top: number) => void;
 };
 
 export default class CameraBridge extends (EventEmitter as new () => TypedEmitter<CameraBridgeEvents>) {
@@ -16,13 +21,13 @@ export default class CameraBridge extends (EventEmitter as new () => TypedEmitte
   public constructor() {
     super();
 
-    this.start = this.start.bind(this);
+    this.restart = this.restart.bind(this);
     this.start();
   }
 
   private start() {
     this.process = spawn('python', ['camera.py'], {
-      cwd: 'src/runtime',
+      cwd: process.env.NODE_ENV != 'production' ? 'src/runtime' : undefined,
       stdio: 'pipe',
     });
 
@@ -45,11 +50,15 @@ export default class CameraBridge extends (EventEmitter as new () => TypedEmitte
       console.error(data.toString('ascii'));
     });
 
-    this.process.on('exit', this.start);
+    this.process.on('exit', this.restart);
+  }
+
+  private restart() {
+    this.start();
   }
 
   public stop() {
-    this.process.off('exit', this.start);
+    this.process.off('exit', this.restart);
     this.process.kill();
   }
 
@@ -66,7 +75,15 @@ export default class CameraBridge extends (EventEmitter as new () => TypedEmitte
         'photo-result',
         response.photoResult.filename,
         response.photoResult.timeTakenMillis,
-        response.photoResult.wellKnown
+        response.photoResult.wellKnown,
+      );
+    }
+
+    if (response.regionOfInterest) {
+      this.emit(
+        'region-of-interest',
+        response.regionOfInterest.left,
+        response.regionOfInterest.top,
       );
     }
   }

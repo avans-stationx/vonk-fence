@@ -17,7 +17,7 @@
 }
 
 .photo {
-  width: auto;
+  width: 400px;
   height: 100%;
   object-fit: contain;
 }

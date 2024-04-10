@@ -2,8 +2,11 @@ syntax = "proto3";
 
 package vonk_fence;
 
+import "shared.proto";
+
 message CameraOut {
     optional PhotoResult photo_result = 1;
+    optional RegionOfInterest region_of_interest = 2;
 }
 
 message PhotoResult {

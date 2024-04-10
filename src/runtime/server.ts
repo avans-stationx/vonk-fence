@@ -1,9 +1,13 @@
 import http from 'http';
 import Express from 'express';
 import Next from 'next';
+import { AddressInfo } from 'net';
+import { networkInterfaces } from 'os';
 
-export async function createServer(photoPath: string) {
+export async function createServer(photoPath: string, audioPath: string) {
   const app = Express();
+
+  const server = http.createServer(app);
 
   const next = Next({
     customServer: true,
@@ -12,6 +16,7 @@ export async function createServer(photoPath: string) {
   });
 
   app.use('/photos', Express.static(photoPath));
+  app.use('/audio', Express.static(audioPath));
 
   let leftGain = 0.5;
   let rightGain = 0.5;
@@ -19,6 +24,23 @@ export async function createServer(photoPath: string) {
   app.get('/volume', (request, response) =>
     response.json({ leftGain, rightGain }),
   );
+
+  app.get('/ip-address', (request, response) => {
+    const networks = networkInterfaces();
+
+    const addresses: string[] = [];
+
+    for (let networkName of Object.keys(networks)) {
+      for (const net of networks[networkName]) {
+        const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4;
+        if (net.family == familyV4Value && !net.internal) {
+          addresses.push(net.address);
+        }
+      }
+    }
+
+    response.json({ ips: addresses });
+  });
 
   function setGains(left, right) {
     leftGain = left;
@@ -31,7 +53,7 @@ export async function createServer(photoPath: string) {
   await next.prepare();
 
   return {
-    server: http.createServer(app),
+    server,
     setGains,
   };
 }

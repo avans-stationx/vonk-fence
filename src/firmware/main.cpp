@@ -9,8 +9,8 @@
 
 Detector detector(A2, 300, 50, 1000);
 Potmeter balance(A3, 20, 100);
-Potmeter regionOfInterestLeft(A4, 20, 100);
-Potmeter regionOfInterestTop(A5, 20, 100);
+Potmeter regionOfInterestLeft(A4, 20, 500);
+Potmeter regionOfInterestTop(A5, 20, 500);
 RainbowLed bus(16, 2, NEO_GRB | NEO_KHZ800, 100, 200);
 RainbowLed diorama(16, 3, NEO_GRB | NEO_KHZ800, 100, 200);
 RainbowLed illusion(16, 4, NEO_GRB | NEO_KHZ800, 100, 200);

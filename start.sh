@@ -1,5 +1,19 @@
 #!/usr/bin/env bash
 
+get_device_path() {
+  REGEX='^PATH="(.+)" LABEL="vonk"*'
+  DEVICES="$(lsblk --pairs --output path,label --shell)"
+
+  echo "$DEVICES" | while read DEVICE
+  do
+    if [[ $DEVICE =~ $REGEX ]]
+    then
+      DEVICE_PATH="${BASH_REMATCH[1]}"
+      echo $DEVICE_PATH
+    fi
+  done
+}
+
 source .venv/bin/activate
 
 if [[ $VONK_ENV == production ]] || [[ $* == --production ]]
@@ -31,7 +45,8 @@ then
   fi
 
   sudo mkdir -p $VONK_MOUNT_POINT
-  sudo mount /dev/sda1 $VONK_MOUNT_POINT -o uid=$USER -o gid=$USER
+
+  sudo mount $(get_device_path) $VONK_MOUNT_POINT -o uid=$USER -o gid=$USER
   mkdir -p $VONK_MOUNT_POINT/photos
 
   cd build

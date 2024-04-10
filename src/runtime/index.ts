@@ -12,8 +12,18 @@ async function main() {
   const storagePath = path.resolve(process.env['VONK_MOUNT_POINT']);
   const photoPath = path.join(storagePath, 'photos');
 
-  const { server, setGains } = await createServer(photoPath);
-  server.listen(process.env.NODE_ENV != 'production' ? 3000 : undefined);
+  const audioPath = path.resolve(
+    __dirname,
+    process.env.NODE_ENV != 'production'
+      ? '../../public/audio'
+      : '../public/audio',
+  );
+
+  const { server, setGains } = await createServer(photoPath, audioPath);
+  server.listen(
+    process.env.NODE_ENV != 'production' ? 3000 : undefined,
+    '0.0.0.0',
+  );
 
   const { port } = server.address() as AddressInfo;
 
@@ -43,11 +53,6 @@ async function main() {
     } else {
       takePhoto();
     }
-  });
-
-  firmware.on('volume', (left, right) => {
-    setGains(left, right);
-    trigger('v');
   });
 
   firmware.on('volume', (left, right) => {

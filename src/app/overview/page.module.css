@@ -1,0 +1,13 @@
+.callToAction {
+  fill: #ffffff;
+  font: 400 100px var(--font-roboto-condensed);
+  text-anchor: middle;
+}
+
+.callToAction .website {
+  text-decoration: underline;
+}
+
+.callToAction .payoff {
+  font-weight: 700;
+}

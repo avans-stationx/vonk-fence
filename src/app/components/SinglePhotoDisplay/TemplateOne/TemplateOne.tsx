@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './TemplateOne.module.css';
+import Logo from '../../Logo/Logo';
 
 type TemplateOneProps = {
   children?: React.ReactNode;
@@ -32,6 +33,12 @@ const TemplateOne: React.FC<TemplateOneProps> = ({
         </clipPath>
       </defs>
       <rect className={styles.background} width="3840" height="2250" />
+      <g className={styles.madeBy} transform="translate(3300, 2000)">
+        <Logo transform="scale(0.25)" />
+        <text x="22" y="0">
+          <tspan>Made by</tspan>
+        </text>
+      </g>
       <image
         className={styles.photo}
         width="1500"
@@ -40,7 +47,7 @@ const TemplateOne: React.FC<TemplateOneProps> = ({
         clipPath="url(#photo-circle)"
       />
       <text className={styles.serial} x="880" y="1975">
-        #{serialNumber.toString().padStart(5, '0')}
+        <tspan>#{serialNumber.toString().padStart(5, '0')}</tspan>
       </text>
       <g className={styles.flame}>
         <path d="M330.16,1395.28c-15.55-1.11-36.24,56.26-35.75,69.95.63,17.61,12.56,45.91,28.49,53.64,4.28-6.17-1.21-13.36,4.4-18.11.77-17.4,17.49-30.75,18.77-49.42,1.34-19.65-8.22-38.63-15.9-56.05Z" />

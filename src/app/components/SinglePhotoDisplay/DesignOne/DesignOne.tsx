@@ -12,19 +12,19 @@ const DesignOne: React.FC<DesignProps> = (props) => {
         <text className={styles.headline}>Attentie!</text>
         <text className={styles.body} y="150">
           <tspan x="0" dy={lineHeight}>
-            Wil de eigenaar
+            Wil de eigenaar van
           </tspan>
           <tspan x="0" dy={lineHeight}>
-            van dit oog zich
+            dit oog zich melden bij
           </tspan>
           <tspan x="0" dy={lineHeight}>
-            melden bij VONK
+            VONK Onderwijsinnovatie
           </tspan>
           <tspan x="0" dy={lineHeight}>
-            en zich inschrijven{' '}
+            en zich inschrijven
           </tspan>
           <tspan x="0" dy={lineHeight}>
-            voor de roadshow?
+            voor de Roadtrip?
           </tspan>
         </text>
       </g>

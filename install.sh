@@ -17,7 +17,7 @@ python -m venv .venv --system-site-packages
 source .venv/bin/activate
 pip install -r requirements.txt
 
-sudo apt install -y openbox xinit chromium-browser protobuf-compiler
+sudo apt install -y xserver-xorg raspberrypi-ui-mods chromium-browser protobuf-compiler
 
 ./build.sh
 
@@ -25,9 +25,17 @@ if $PRODUCTION
 then
   SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)"
 
-  mkdir -p ~/.config/openbox
-  echo -e "#!/bin/bash\ncd $SCRIPT_DIR\nexec ./start.sh" > ~/.config/openbox/autostart
-  echo -e "#!/bin/bash\nexport VONK_ENV=production\nexec openbox-session" > ~/.xinitrc
+  sudo useradd --system vonk
+  sudo chown vonk:vonk "$SCRIPT_DIR"
+  sudo sed "s@#WorkingDirectory#@WorkingDirectory=$SCRIPT_DIR@g" > /etc/systemd/system/vonk.service
+  sudo systemctl enable vonk
+  sudo systemctl start vonk
+
+  sudo raspi-config nonint do_blanking
+  sudo raspi-config nonint do_vnc 1
+  sudo raspi-config nonint do_boot_behaviour B4
 
   pnpm prune --prod
+
+  sudo shutdown -r now
 fi

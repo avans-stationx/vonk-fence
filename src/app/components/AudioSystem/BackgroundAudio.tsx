@@ -21,7 +21,7 @@ const BackgroundAudio: React.FC<BackgroundAudioProps> = ({
   const source = useRef<MediaElementAudioSourceNode>();
 
   useEffect(() => {
-    if (!audio.current || source) {
+    if (!audio.current || source.current) {
       return;
     }
 

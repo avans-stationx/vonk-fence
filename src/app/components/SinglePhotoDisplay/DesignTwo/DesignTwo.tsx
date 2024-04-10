@@ -30,7 +30,7 @@ const DesignTwo: React.FC<DesignProps> = (props) => {
             schermen gebeurt, schrijf je
           </tspan>
           <tspan x="0" dy={bodyLineHeight}>
-            dan in voor de VONK Roadshow!
+            dan in voor de VONK Roadtrip!
           </tspan>
         </text>
       </g>

@@ -38,9 +38,9 @@ picam.start()
 
 (sensor_width, sensor_height) = picam.camera_properties['PixelArraySize']
 half_sensor_width = sensor_width * 0.5
-quarter_sensor_width = sensor_width * 0.25
+predefined_offset_width = sensor_width * 0.25
 half_sensor_height = sensor_height * 0.5
-quarter_sensor_height = sensor_height * 0.25
+predefined_offset_height = sensor_height * 0.15
 
 gc.disable()
 gc.collect()
@@ -73,10 +73,14 @@ while True:
         gc.collect()
 
     if request.HasField('region_of_interest'):
-        left = quarter_sensor_width + (request.region_of_interest.left * half_sensor_width)
-        top = quarter_sensor_height + (request.region_of_interest.top * half_sensor_height)
-        controls['ScalerCrop'] = (floor(left), floor(top), crop_size, crop_size)
+        left = floor(predefined_offset_width + (request.region_of_interest.left * half_sensor_width))
+        top = floor(predefined_offset_height + (request.region_of_interest.top * half_sensor_height))
+        controls['ScalerCrop'] = (left, top, crop_size, crop_size)
         picam.set_controls(controls)
+
+        has_response = True
+        response.region_of_interest.left = left
+        response.region_of_interest.top = top
 
     if has_response:
         encoded_response = response.SerializeToString()

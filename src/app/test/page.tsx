@@ -10,12 +10,18 @@ const photoPath = path.join(
 );
 
 async function loadPhoto() {
-  const photo = await fs.readFile(photoPath, {
-    encoding: 'base64',
-  });
+  try {
+    const photo = await fs.readFile(photoPath, {
+      encoding: 'base64',
+    });
 
-  return `data:image/jpeg;base64,${photo}`;
+    return `data:image/jpeg;base64,${photo}`;
+  } catch {
+    return 'https://picsum.photos/1500';
+  }
 }
+
+export const revalidate = 0;
 
 const Test: React.FC = async () => {
   const photo = await loadPhoto();

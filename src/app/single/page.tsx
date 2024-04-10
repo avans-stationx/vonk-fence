@@ -37,6 +37,8 @@ async function getLatestPhoto(): Promise<DesignProps> {
   }
 }
 
+export const revalidate = 0;
+
 const Single: React.FC = async () => {
   const photo = await getLatestPhoto();
 

@@ -24,3 +24,12 @@
 .serial {
   font-size: 100px;
 }
+
+.madeBy {
+  opacity: .75;
+}
+
+.madeBy text {
+  fill: #ffffff;
+  font: 500 50px var(--font-roboto-condensed);
+}

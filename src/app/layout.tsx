@@ -24,7 +24,7 @@ type RootLayoutProps = {
 const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   return (
     <html lang="en">
-      <body className={robotoCondensed.className}>
+      <body className={robotoCondensed.variable}>
         <AudioSystemProvider>
           {children}
           <BackgroundAudio

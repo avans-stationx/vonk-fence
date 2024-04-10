@@ -2,6 +2,9 @@ import React from 'react';
 import path from 'path';
 import { promises as fs } from 'fs';
 import SlidingAnimation from '../components/GalleryPhotoDisplay/SlidingAnimation';
+import styles from './page.module.css';
+
+export const revalidate = 0;
 
 const Overview: React.FC = async () => {
   async function getPhotos(): Promise<string[]> {
@@ -15,9 +18,10 @@ const Overview: React.FC = async () => {
     }
   }
 
-  const photoRadius = 300;
-  const photoCount = 6;
+  const photoRadius = 250;
+  const photoCount = 8;
   const photos = await getPhotos();
+  const lineHeight = 140;
 
   async function getRandomPhoto(): Promise<string> {
     'use server';
@@ -69,7 +73,7 @@ const Overview: React.FC = async () => {
         duration="5s"
         getPhoto={getRandomPhoto}
         width={3840}
-        y={100}
+        y={50}
         photoProps={{
           width: photoRadius * 2,
           clipPath: 'url(#photo-circle)',
@@ -79,10 +83,10 @@ const Overview: React.FC = async () => {
         photoCount={photoCount}
         initialPhotos={initialSecondRow}
         direction="right"
-        duration="5s"
+        duration="8s"
         getPhoto={getRandomPhoto}
         width={3840}
-        y={850}
+        y={600}
         photoProps={{
           width: photoRadius * 2,
           clipPath: 'url(#photo-circle)',
@@ -92,15 +96,28 @@ const Overview: React.FC = async () => {
         photoCount={photoCount}
         initialPhotos={initialThirdRow}
         direction="left"
-        duration="5s"
+        duration="3s"
         getPhoto={getRandomPhoto}
         width={3840}
-        y={1600}
+        y={1150}
         photoProps={{
           width: photoRadius * 2,
           clipPath: 'url(#photo-circle)',
         }}
       />
+      <text className={styles.callToAction} transform="translate(1920, 1850)">
+        <tspan>Als je jouw naam en e-mailadres hier op de lijst schrijft</tspan>
+        <tspan x="0" dy={lineHeight}>
+          of als je jezelf aanmeldt via
+        </tspan>
+        <tspan className={styles.website} dx="20">
+          roadtrip.avans-evenementen.nl
+        </tspan>
+        <tspan>,</tspan>
+        <tspan className={styles.payoff} x="0" dy={lineHeight}>
+          dan gluur ik voor deze keer door mijn vingers!
+        </tspan>
+      </text>
     </svg>
   );
 };

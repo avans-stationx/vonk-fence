@@ -28,7 +28,8 @@ export function useRandomSoundEffectPlaylist(
     }
 
     const effect =
-      playlist[Math.floor(Math.random() * playlist.current.length)];
+      playlist.current[Math.floor(Math.random() * playlist.current.length)];
+
     currentlyPlaying = createSoundEffectSource(
       context,
       effect,
